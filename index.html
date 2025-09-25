@@ -516,51 +516,150 @@
 
         @media (max-width: 768px) {
             .container {
-                margin: 0 10px;
+                margin: 0 5px;
                 border-radius: 15px;
+                min-height: calc(100vh - 10px);
             }
 
             .tab-content {
-                padding: 15px;
+                padding: 10px;
             }
 
             h1 {
-                font-size: 1.3em;
-                padding: 16px;
+                font-size: 1.2em;
+                padding: 12px;
+            }
+
+            #camera {
+                max-height: 40vh;
+                width: 100%;
             }
 
             .camera-controls {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
+                padding: 0 5px;
             }
 
             .camera-controls button {
                 width: 100%;
                 max-width: none;
+                min-width: auto;
+                padding: 12px 16px;
+                font-size: 16px;
             }
 
             .edit-controls {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
+                padding: 0 5px;
             }
 
             .edit-controls button {
                 width: 100%;
                 max-width: none;
+                min-width: auto;
+                padding: 12px 16px;
+                font-size: 16px;
             }
 
             .save-controls {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
+                padding: 0 5px;
             }
 
             .save-controls button {
                 width: 100%;
                 max-width: none;
+                padding: 14px 20px;
+                font-size: 16px;
             }
 
             .filters {
                 grid-template-columns: 1fr;
+                padding: 15px;
+            }
+
+            .form-group select,
+            .form-group textarea,
+            .form-group input[type="text"] {
+                font-size: 16px;
+                padding: 12px;
+            }
+
+            .classification-form {
+                padding: 15px;
+                margin-top: 15px;
+            }
+
+            .modal-content {
+                margin: 10px;
+                max-width: calc(100vw - 20px);
+                max-height: calc(100vh - 20px);
+            }
+
+            .modal-controls {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .modal-controls button {
+                width: 100%;
+                max-width: none;
+            }
+
+            #photo-preview {
+                max-height: 40vh;
+            }
+        }
+
+        /* 針對小螢幕手機的額外優化 */
+        @media (max-width: 480px) {
+            .container {
+                margin: 0 2px;
+                min-height: calc(100vh - 4px);
+            }
+
+            h1 {
+                font-size: 1.1em;
+                padding: 10px;
+            }
+
+            .tab-btn {
+                padding: 12px 8px;
+                font-size: 14px;
+            }
+
+            .tab-content {
+                padding: 8px;
+            }
+
+            button {
+                min-height: 44px;
+                font-size: 15px;
+                padding: 10px 14px;
+            }
+
+            .camera-controls,
+            .edit-controls,
+            .save-controls {
+                gap: 6px;
+                padding: 0 2px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .classification-form {
+                padding: 12px;
+            }
+
+            .notification {
+                right: 10px;
+                left: 10px;
+                max-width: none;
             }
         }
 
