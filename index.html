@@ -1033,14 +1033,19 @@
         // 相機功能
         async function initializeCamera() {
             try {
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    await startCamera();
-                    console.log('相機初始化成功');
-                } else {
-                    console.log('此裝置不支援相機功能');
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    console.log('此瀏覽器不支援相機功能');
+                    document.getElementById('capture-btn').disabled = true;
+                    document.getElementById('switch-camera-btn').disabled = true;
+                    showNotification('此瀏覽器不支援相機功能，請使用檔案匯入', 'error');
+                    return;
                 }
+                
+                await startCamera();
+                console.log('相機初始化成功');
             } catch (error) {
                 console.error('相機初始化失敗:', error);
+                handleCameraError(error);
             }
         }
 
@@ -1053,24 +1058,59 @@
                 const constraints = {
                     video: {
                         facingMode: facingMode,
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 }
+                        width: { ideal: 1920, max: 1920 },
+                        height: { ideal: 1080, max: 1080 }
                     }
                 };
 
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
                 const video = document.getElementById('camera');
                 video.srcObject = currentStream;
+                
+                // 確保視訊載入
+                video.onloadedmetadata = function() {
+                    video.play();
+                };
+                
             } catch (error) {
                 console.error('啟動相機失敗:', error);
+                handleCameraError(error);
                 throw error;
             }
+        }
+
+        function handleCameraError(error) {
+            let message = '相機啟動失敗';
+            
+            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                message = '請允許相機權限後重新整理頁面';
+            } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+                message = '找不到相機裝置';
+            } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+                message = '相機被其他應用程式佔用';
+            } else if (error.name === 'OverconstrainedError' || error.name === 'ConstraintNotSatisfiedError') {
+                message = '相機不支援所需規格';
+            } else if (error.name === 'NotSupportedError') {
+                message = '瀏覽器不支援相機功能';
+            } else if (error.name === 'SecurityError') {
+                message = '需要 HTTPS 連線才能使用相機';
+            }
+            
+            showError(message + ' - 可使用檔案匯入功能');
+            
+            // 保留所有按鈕，只是禁用相機相關功能
+            document.getElementById('capture-btn').disabled = true;
+            document.getElementById('switch-camera-btn').disabled = true;
+            
+            // 突出顯示檔案匯入按鈕
+            document.getElementById('import-btn').style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a52)';
         }
 
         async function switchCamera() {
             facingMode = facingMode === 'environment' ? 'user' : 'environment';
             try {
                 await startCamera();
+                showSuccess(facingMode === 'environment' ? '已切換到後鏡頭' : '已切換到前鏡頭');
             } catch (error) {
                 console.error('切換相機失敗:', error);
                 facingMode = facingMode === 'environment' ? 'user' : 'environment';
@@ -1081,13 +1121,14 @@
         function capturePhoto() {
             try {
                 const video = document.getElementById('camera');
-                const canvas = document.getElementById('photo-canvas');
-                const ctx = canvas.getContext('2d');
-
+                
                 if (video.videoWidth === 0 || video.videoHeight === 0) {
-                    showError('請先開啟相機');
+                    showError('相機未就緒，請稍後再試');
                     return;
                 }
+
+                const canvas = document.getElementById('photo-canvas');
+                const ctx = canvas.getContext('2d');
 
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
@@ -1097,11 +1138,14 @@
                 canvas.toBlob(blob => {
                     if (blob) {
                         displayPhotoPreview(blob);
+                        showSuccess('拍照成功');
+                    } else {
+                        showError('拍照失敗，請重試');
                     }
                 }, 'image/jpeg', 0.9);
             } catch (error) {
                 console.error('拍照失敗:', error);
-                showError('拍照失敗');
+                showError('拍照失敗：' + error.message);
             }
         }
 
