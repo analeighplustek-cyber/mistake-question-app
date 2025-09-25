@@ -113,6 +113,8 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             margin-bottom: 20px;
             object-fit: cover;
+            aspect-ratio: 4/3;
+            background: #000;
         }
 
         .camera-controls {
@@ -1030,95 +1032,121 @@
             }
         }
 
-        // 相機功能 - 簡化版本，優先確保檔案匯入功能
+        // 相機功能 - 加強權限請求版本
         async function initializeCamera() {
+            const video = document.getElementById('camera');
+            
+            // 先檢查基本支援
+            if (!navigator.mediaDevices?.getUserMedia) {
+                console.log('瀏覽器不支援相機');
+                handleCameraUnavailable();
+                return;
+            }
+
+            // 顯示載入狀態
+            video.style.background = '#f0f0f0';
+            video.style.display = 'flex';
+            video.style.alignItems = 'center';
+            video.style.justifyContent = 'center';
+            video.innerHTML = '<div style="color: #666; text-align: center; padding: 20px;">正在啟動相機...</div>';
+
             try {
-                // 檢查基本支援
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    handleCameraNotSupported();
-                    return;
-                }
-                
-                // 嘗試啟動相機，但不強制要求
-                await requestCameraPermission();
-                
+                await startCamera();
             } catch (error) {
                 console.error('相機初始化失敗:', error);
-                handleCameraError(error);
+                handleCameraUnavailable();
             }
         }
 
-        async function requestCameraPermission() {
+        async function startCamera() {
+            // 停止現有串流
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+
             try {
+                // 修正比例的相機約束
                 const constraints = {
                     video: {
                         facingMode: facingMode,
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
+                        width: { ideal: 1280, max: 1920 },
+                        height: { ideal: 960, max: 1440 },
+                        aspectRatio: { ideal: 4/3 }
                     }
                 };
 
+                console.log('請求相機權限...');
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                
                 const video = document.getElementById('camera');
                 video.srcObject = currentStream;
+                video.style.background = 'none';
+                video.innerHTML = '';
                 
-                video.onloadedmetadata = function() {
-                    video.play();
-                };
-                
-                console.log('相機啟動成功');
-                showSuccess('相機已就緒');
+                return new Promise((resolve, reject) => {
+                    video.onloadedmetadata = () => {
+                        video.play()
+                            .then(() => {
+                                console.log('相機啟動成功, 解析度:', video.videoWidth, 'x', video.videoHeight);
+                                showSuccess('相機已就緒');
+                                resolve();
+                            })
+                            .catch(reject);
+                    };
+                    
+                    video.onerror = reject;
+                    
+                    // 5秒超時
+                    setTimeout(() => reject(new Error('相機啟動超時')), 5000);
+                });
                 
             } catch (error) {
                 throw error;
             }
         }
 
-        function handleCameraNotSupported() {
-            console.log('瀏覽器不支援相機功能');
+        function handleCameraUnavailable() {
+            const video = document.getElementById('camera');
+            video.style.background = 'linear-gradient(45deg, #f8f9fa, #e9ecef)';
+            video.innerHTML = `
+                <div style="color: #666; text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
+                    <div>相機無法使用</div>
+                    <div style="font-size: 12px; margin-top: 5px;">請使用下方檔案匯入功能</div>
+                </div>
+            `;
+            
+            // 禁用相機按鈕
             document.getElementById('capture-btn').disabled = true;
             document.getElementById('switch-camera-btn').disabled = true;
             
-            // 不顯示錯誤，只是靜默禁用相機功能
-            document.getElementById('import-btn').style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a52)';
-        }
-
-        function handleCameraError(error) {
-            console.log('相機錯誤:', error.name);
-            
-            // 禁用相機功能但不顯示煩人的錯誤訊息
-            document.getElementById('capture-btn').disabled = true;
-            document.getElementById('switch-camera-btn').disabled = true;
-            
-            // 如果是權限問題，顯示溫和的提示
-            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-                // 只在控制台記錄，不打擾用戶
-                console.log('相機權限被拒絕，使用檔案匯入功能');
-            }
-            
-            // 突出顯示檔案匯入
-            document.getElementById('import-btn').style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a52)';
+            // 突出檔案匯入
+            const importBtn = document.getElementById('import-btn');
+            importBtn.style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a52)';
+            importBtn.style.transform = 'scale(1.05)';
         }
 
         async function switchCamera() {
             if (document.getElementById('switch-camera-btn').disabled) {
-                showNotification('請使用檔案匯入功能');
+                showNotification('請點擊下方檔案匯入按鈕');
                 return;
             }
             
             facingMode = facingMode === 'environment' ? 'user' : 'environment';
+            
             try {
-                await requestCameraPermission();
-                showSuccess(facingMode === 'environment' ? '已切換到後鏡頭' : '已切換到前鏡頭');
+                await startCamera();
+                showSuccess(`已切換到${facingMode === 'environment' ? '後' : '前'}鏡頭`);
             } catch (error) {
+                console.error('切換相機失敗:', error);
                 facingMode = facingMode === 'environment' ? 'user' : 'environment';
-                showError('無法切換相機，建議使用檔案匯入');
+                showNotification('相機切換失敗，請使用檔案匯入');
             }
         }
 
         function capturePhoto() {
             if (document.getElementById('capture-btn').disabled) {
-                showNotification('請使用檔案匯入功能');
                 document.getElementById('file-input').click();
                 return;
             }
@@ -1126,7 +1154,7 @@
             try {
                 const video = document.getElementById('camera');
                 
-                if (video.videoWidth === 0 || video.videoHeight === 0) {
+                if (!currentStream || video.videoWidth === 0) {
                     showNotification('相機未就緒，請使用檔案匯入');
                     document.getElementById('file-input').click();
                     return;
@@ -1135,25 +1163,61 @@
                 const canvas = document.getElementById('photo-canvas');
                 const ctx = canvas.getContext('2d');
 
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-
-                ctx.drawImage(video, 0, 0);
+                // 使用實際視訊尺寸，確保比例一致
+                const videoWidth = video.videoWidth;
+                const videoHeight = video.videoHeight;
+                
+                canvas.width = videoWidth;
+                canvas.height = videoHeight;
+                
+                // 清除畫布並繪製
+                ctx.clearRect(0, 0, videoWidth, videoHeight);
+                ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
 
                 canvas.toBlob(blob => {
                     if (blob) {
                         displayPhotoPreview(blob);
-                        showSuccess('拍照成功');
+                        showSuccess(`拍照成功 (${videoWidth}x${videoHeight})`);
+                        
+                        // 顯示實際拍攝資訊
+                        const imgObj = new Image();
+                        imgObj.onload = function() {
+                            document.getElementById('resolution').textContent = 
+                                `${this.width} x ${this.height}`;
+                        };
+                        imgObj.src = URL.createObjectURL(blob);
                     } else {
-                        showError('拍照失敗，請使用檔案匯入');
                         document.getElementById('file-input').click();
                     }
                 }, 'image/jpeg', 0.9);
+                
             } catch (error) {
                 console.error('拍照失敗:', error);
-                showNotification('請使用檔案匯入功能');
                 document.getElementById('file-input').click();
             }
+        }
+
+        // 添加手動請求相機權限的按鈕功能
+        function requestCameraPermission() {
+            if (!navigator.mediaDevices?.getUserMedia) {
+                showError('此瀏覽器不支援相機功能');
+                return;
+            }
+            
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    // 立即停止以釋放資源
+                    stream.getTracks().forEach(track => track.stop());
+                    // 重新初始化
+                    initializeCamera();
+                })
+                .catch(error => {
+                    if (error.name === 'NotAllowedError') {
+                        showError('請在瀏覽器設定中允許相機權限');
+                    } else {
+                        showError('無法存取相機：' + error.message);
+                    }
+                });
         }
 
         function handleFileImport(event) {
