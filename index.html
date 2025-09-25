@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#667eea">
     
-    <title>錯題集資料庫 v2.0</title>
+    <title>錯題庫資料庫 v2.0</title>
     <style>
         * {
             margin: 0;
@@ -516,8 +516,55 @@
             display: none !important;
         }
 
-        /* 強制移動端優化樣式 */
+        /* 強制移動端模態框優化 */
         @media screen and (max-width: 768px) {
+            .modal {
+                padding: 10px !important;
+            }
+            
+            .modal-content {
+                margin: 0 !important;
+                width: calc(100vw - 20px) !important;
+                max-width: calc(100vw - 20px) !important;
+                max-height: calc(100vh - 20px) !important;
+                border-radius: 15px !important;
+            }
+
+            .modal-controls {
+                flex-direction: column !important;
+                gap: 10px !important;
+                padding: 15px !important;
+            }
+
+            .modal-controls button {
+                width: 100% !important;
+                max-width: none !important;
+                min-height: 48px !important;
+                font-size: 16px !important;
+                border-radius: 12px !important;
+                touch-action: manipulation !important;
+                -webkit-tap-highlight-color: transparent !important;
+            }
+
+            #modal-image {
+                max-height: 30vh !important;
+                object-fit: contain !important;
+            }
+
+            .question-details {
+                padding: 15px !important;
+            }
+
+            .close {
+                font-size: 28px !important;
+                padding: 8px !important;
+                min-width: 44px !important;
+                min-height: 44px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
             .container {
                 margin: 0 !important;
                 border-radius: 0 !important;
@@ -620,22 +667,6 @@
                 margin-top: 15px !important;
             }
 
-            .modal-content {
-                margin: 5px !important;
-                max-width: calc(100vw - 10px) !important;
-                max-height: calc(100vh - 10px) !important;
-            }
-
-            .modal-controls {
-                flex-direction: column !important;
-                gap: 8px !important;
-            }
-
-            .modal-controls button {
-                width: 100% !important;
-                max-width: none !important;
-            }
-
             #photo-preview {
                 max-height: 40vh !important;
                 width: 100% !important;
@@ -696,11 +727,11 @@
     <div id="notification" class="notification"></div>
 
     <div class="container">
-        <h1>錯題集資料庫 v2.0</h1>
+        <h1>錯題庫資料庫 v2.0</h1>
         
         <div class="tabs">
             <button class="tab-btn active" data-tab="capture">📸 拍照/匯入</button>
-            <button class="tab-btn" data-tab="collection">📚 錯題集</button>
+            <button class="tab-btn" data-tab="collection">📚 錯題庫</button>
         </div>
         
         <div class="tab-content" id="capture-tab">
@@ -789,7 +820,7 @@
         
         <div class="tab-content hidden" id="collection-tab">
             <div class="filter-container">
-                <h2>📚 錯題集</h2>
+                <h2>📚 錯題庫</h2>
                 
                 <div style="text-align: center; margin-bottom: 20px;">
                     <button id="export-btn" style="background: linear-gradient(45deg, #17a2b8, #138496); color: white; margin: 5px;">
@@ -1676,12 +1707,37 @@
         }
 
         function deleteQuestion() {
-            if (confirm('確定要刪除這個錯題嗎？')) {
-                questions = questions.filter(q => q.id !== currentEditingId);
-                saveQuestions();
-                showSuccess('錯題已刪除');
+            if (!currentEditingId) {
+                showError('無法刪除：找不到題目ID');
                 closeModal();
-                displayQuestions();
+                return;
+            }
+            
+            const confirmed = confirm('確定要刪除這個錯題嗎？此操作無法復原。');
+            if (confirmed) {
+                try {
+                    const originalLength = questions.length;
+                    
+                    // 找到並刪除問題
+                    questions = questions.filter(q => q.id !== currentEditingId);
+                    
+                    if (questions.length < originalLength) {
+                        // 立即儲存更改
+                        if (saveQuestions()) {
+                            showSuccess('錯題已刪除');
+                            closeModal();
+                            displayQuestions();
+                            console.log('成功刪除題目，剩餘:', questions.length, '題');
+                        } else {
+                            showError('刪除失敗：無法儲存更改');
+                        }
+                    } else {
+                        showError('刪除失敗：找不到指定的題目');
+                    }
+                } catch (error) {
+                    console.error('刪除題目時發生錯誤:', error);
+                    showError('刪除失敗：' + error.message);
+                }
             }
         }
 
