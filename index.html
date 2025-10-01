@@ -2,11 +2,19 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#667eea">
-    
-    <title>錯題庫資料庫 v2.0</title>
+    <title>eCoach - 智慧錯題管理系統</title>
     <style>
+        :root {
+            --primary-start: #667eea;
+            --primary-end: #764ba2;
+            --success: #28a745;
+            --error: #dc3545;
+            --text-muted: #6c757d;
+            --bg-light: #f8f9fa;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,11 +22,10 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Microsoft JhengHei', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
             min-height: 100vh;
             padding: 20px 0;
-            overflow-x: hidden;
         }
 
         .notification {
@@ -31,7 +38,7 @@
             font-size: 14px;
             z-index: 1000;
             transform: translateX(100%);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s;
             max-width: 300px;
         }
 
@@ -40,11 +47,11 @@
         }
 
         .notification.success {
-            background: #28a745;
+            background: var(--success);
         }
 
         .notification.error {
-            background: #dc3545;
+            background: var(--error);
         }
 
         .container {
@@ -60,21 +67,16 @@
         h1 {
             text-align: center;
             padding: 20px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, var(--primary-start), var(--primary-end));
             color: white;
-            margin: 0;
             font-size: 1.5em;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
             font-weight: 600;
         }
 
         .tabs {
             display: flex;
-            background: #f8f9fa;
+            background: var(--bg-light);
             border-bottom: 3px solid #e9ecef;
-            position: sticky;
-            top: 0;
-            z-index: 100;
         }
 
         .tab-btn {
@@ -85,44 +87,29 @@
             cursor: pointer;
             font-size: 15px;
             font-weight: 600;
-            color: #6c757d;
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
+            color: var(--text-muted);
+            transition: all 0.3s;
         }
 
         .tab-btn.active {
-            color: #667eea;
+            color: var(--primary-start);
             background: white;
-            border-bottom-color: #667eea;
+            border-bottom: 3px solid var(--primary-start);
         }
 
         .tab-content {
             padding: 20px;
-            min-height: calc(100vh - 200px);
+            min-height: 400px;
         }
 
-        .camera-container {
-            text-align: center;
-            margin-bottom: 20px;
+        .hidden {
+            display: none;
         }
 
         #camera {
             width: 100%;
-            max-width: 100%;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             margin-bottom: 20px;
-            object-fit: cover;
-            aspect-ratio: 4/3;
-            background: #000;
-        }
-
-        .camera-controls {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            padding: 0 10px;
         }
 
         button {
@@ -132,254 +119,83 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            min-height: 48px;
+            color: white;
+            margin: 5px;
             min-width: 120px;
-            touch-action: manipulation;
         }
 
-        #capture-btn {
+        .btn-primary {
             background: linear-gradient(45deg, #ff6b6b, #ee5a52);
-            color: white;
-            flex: 1;
-            max-width: 200px;
         }
 
-        #import-btn, #switch-camera-btn {
+        .btn-secondary {
             background: linear-gradient(45deg, #4ecdc4, #44a08d);
-            color: white;
-            flex: 1;
-            max-width: 150px;
         }
 
-        .edit-container {
-            margin-top: 20px;
+        .btn-success {
+            background: linear-gradient(45deg, var(--success), #20c997);
         }
 
-        .preview-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        #photo-preview {
-            max-width: 100%;
-            max-height: 50vh;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 10px;
-        }
-
-        .image-info {
-            color: #6c757d;
-            font-size: 13px;
-        }
-
-        .edit-controls {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            padding: 0 10px;
-            flex-wrap: wrap;
-        }
-
-        #select-question-btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            flex: 1;
-            max-width: 120px;
-            min-width: 100px;
-        }
-
-        #select-answer-btn {
-            background: linear-gradient(45deg, #28a745, #20c997);
-            color: white;
-            flex: 1;
-            max-width: 120px;
-            min-width: 100px;
-        }
-
-        #clear-selections-btn {
-            background: linear-gradient(45deg, #dc3545, #c82333);
-            color: white;
-            flex: 1;
-            max-width: 100px;
-            min-width: 80px;
-        }
-
-        #reset-btn {
-            background: linear-gradient(45deg, #ffecd2, #fcb69f);
-            color: #333;
-            flex: 1;
-            max-width: 100px;
-            min-width: 80px;
-        }
-
-        .classification-form {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-top: 20px;
-        }
-
-        .classification-form h3 {
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.3em;
-            font-weight: 600;
+        .btn-danger {
+            background: linear-gradient(45deg, var(--error), #c82333);
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             font-weight: 600;
-            color: #333;
-            font-size: 15px;
         }
 
         .form-group select,
-        .form-group textarea,
-        .form-group input[type="text"] {
+        .form-group textarea {
             width: 100%;
-            padding: 16px;
+            padding: 10px;
             border: 2px solid #e9ecef;
-            border-radius: 15px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-            -webkit-appearance: none;
-            appearance: none;
-            background: white;
-            min-height: 52px;
-        }
-
-        .form-group select:focus,
-        .form-group textarea:focus,
-        .form-group input[type="text"]:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            font-size: 14px;
         }
 
         .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
+            min-height: 100px;
             font-family: inherit;
         }
 
-        .save-controls {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 25px;
-            padding: 0 10px;
-        }
-
-        #save-question-btn {
-            background: linear-gradient(45deg, #28a745, #20c997);
-            color: white;
-            padding: 16px 24px;
-            flex: 1;
-            max-width: 160px;
-        }
-
-        #cancel-btn {
-            background: linear-gradient(45deg, #6c757d, #495057);
-            color: white;
-            padding: 16px 24px;
-            flex: 1;
-            max-width: 120px;
-        }
-
-        .filter-container h2 {
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .filters {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 20px;
-        }
-
-        .filter-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .questions-container {
-            min-height: 200px;
-        }
-
         .question-item {
-            display: flex;
-            flex-direction: column;
             background: white;
-            border-radius: 20px;
+            border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             margin-bottom: 16px;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            padding: 16px;
             cursor: pointer;
+            transition: transform 0.3s;
         }
 
         .question-item:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
 
-        .question-thumbnail {
+        .question-item img {
             width: 100%;
-            height: 180px;
+            max-height: 200px;
             object-fit: cover;
-        }
-
-        .question-info {
-            padding: 16px;
-        }
-
-        .question-tags {
-            display: flex;
-            gap: 6px;
+            border-radius: 10px;
             margin-bottom: 10px;
-            flex-wrap: wrap;
         }
 
-        .tag {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
+        .selection-overlay {
+            position: absolute;
+            border: 2px dashed var(--primary-start);
+            background: rgba(102, 126, 234, 0.1);
+            pointer-events: none;
         }
 
-        .question-notes {
-            color: #6c757d;
-            font-size: 13px;
-            margin-top: 8px;
-            line-height: 1.4;
-        }
-
-        .no-questions {
-            text-align: center;
-            padding: 40px 20px;
-            color: #6c757d;
-            font-size: 16px;
+        .selection-overlay.answer {
+            border-color: var(--success);
+            background: rgba(40, 167, 69, 0.1);
         }
 
         .modal {
@@ -390,335 +206,37 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.5);
             padding: 20px;
-            box-sizing: border-box;
         }
 
         .modal-content {
-            background-color: white;
+            background: white;
             margin: 20px auto;
-            padding: 0;
+            padding: 20px;
             border-radius: 20px;
-            width: 100%;
             max-width: 500px;
             max-height: calc(100vh - 40px);
             overflow: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-
-        .modal-content h2 {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 20px;
-            margin: 0;
-            font-size: 1.3em;
-            font-weight: 600;
         }
 
         .close {
-            color: white;
             float: right;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             cursor: pointer;
-            line-height: 1;
-            padding: 4px;
         }
 
-        .question-details {
-            padding: 20px;
-        }
-
-        #modal-image {
-            width: 100%;
-            max-height: 250px;
-            object-fit: contain;
+        #photo-preview {
+            max-width: 100%;
             border-radius: 15px;
-            margin-bottom: 16px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 10px 0;
         }
 
-        .question-info p {
-            margin-bottom: 12px;
-            font-size: 15px;
-        }
-
-        .notes-content {
-            background: #f8f9fa;
-            padding: 16px;
-            border-radius: 15px;
-            border-left: 4px solid #667eea;
-            white-space: pre-wrap;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .modal-controls {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #e9ecef;
-        }
-
-        #edit-question-btn {
-            background: linear-gradient(45deg, #ffc107, #ff8f00);
-            color: white;
-            flex: 1;
-            max-width: 120px;
-        }
-
-        #delete-question-btn {
-            background: linear-gradient(45deg, #dc3545, #c82333);
-            color: white;
-            flex: 1;
-            max-width: 120px;
-        }
-
-        .selection-overlay {
-            position: absolute;
-            border: 2px dashed #667eea;
-            background: rgba(102, 126, 234, 0.1);
-            pointer-events: none;
-        }
-
-        .selection-overlay.question {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .selection-overlay.answer {
-            border-color: #28a745;
-            background: rgba(40, 167, 69, 0.1);
-        }
-
-        .selection-overlay::before {
-            content: attr(data-type);
-            position: absolute;
-            top: -25px;
-            left: 0;
-            background: #667eea;
-            color: white;
-            padding: 2px 8px;
-            font-size: 12px;
-            font-weight: bold;
-            border-radius: 4px;
-        }
-
-        .selection-overlay.answer::before {
-            background: #28a745;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* 強制移動端模態框優化 */
-        @media screen and (max-width: 768px) {
-            .modal {
-                padding: 10px !important;
-            }
-            
-            .modal-content {
-                margin: 0 !important;
-                width: calc(100vw - 20px) !important;
-                max-width: calc(100vw - 20px) !important;
-                max-height: calc(100vh - 20px) !important;
-                border-radius: 15px !important;
-            }
-
-            .modal-controls {
-                flex-direction: column !important;
-                gap: 10px !important;
-                padding: 15px !important;
-            }
-
-            .modal-controls button {
-                width: 100% !important;
-                max-width: none !important;
-                min-height: 48px !important;
-                font-size: 16px !important;
-                border-radius: 12px !important;
-                touch-action: manipulation !important;
-                -webkit-tap-highlight-color: transparent !important;
-            }
-
-            #modal-image {
-                max-height: 30vh !important;
-                object-fit: contain !important;
-            }
-
-            .question-details {
-                padding: 15px !important;
-            }
-
-            .close {
-                font-size: 28px !important;
-                padding: 8px !important;
-                min-width: 44px !important;
-                min-height: 44px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-            }
-
-            .container {
-                margin: 0 !important;
-                border-radius: 0 !important;
-                min-height: 100vh !important;
-            }
-
-            .tab-content {
-                padding: 10px !important;
-            }
-
-            h1 {
-                font-size: 1.2em !important;
-                padding: 10px !important;
-            }
-
-            #camera {
-                max-height: 35vh !important;
-                width: 100% !important;
-            }
-
-            .camera-controls {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 8px !important;
-                padding: 0 !important;
-                margin: 10px 0 !important;
-            }
-
-            .camera-controls button {
-                width: 100% !important;
-                max-width: none !important;
-                min-width: auto !important;
-                padding: 14px 20px !important;
-                font-size: 16px !important;
-                border-radius: 12px !important;
-                margin: 0 !important;
-                flex: none !important;
-            }
-
-            .edit-controls {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 8px !important;
-                padding: 0 !important;
-                margin: 10px 0 !important;
-            }
-
-            .edit-controls button {
-                width: 100% !important;
-                max-width: none !important;
-                min-width: auto !important;
-                padding: 14px 20px !important;
-                font-size: 16px !important;
-                border-radius: 12px !important;
-                margin: 0 !important;
-                flex: none !important;
-            }
-
-            .save-controls {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 8px !important;
-                padding: 0 !important;
-                margin: 10px 0 !important;
-            }
-
-            .save-controls button {
-                width: 100% !important;
-                max-width: none !important;
-                padding: 16px 24px !important;
-                font-size: 16px !important;
-                border-radius: 12px !important;
-                margin: 0 !important;
-                flex: none !important;
-            }
-
-            /* 確保所有按鈕都遵循移動端樣式 */
+        @media (max-width: 768px) {
             button {
-                min-height: 48px !important;
-                touch-action: manipulation !important;
-                -webkit-appearance: none !important;
-                box-sizing: border-box !important;
-            }
-
-            .filters {
-                grid-template-columns: 1fr !important;
-                padding: 10px !important;
-            }
-
-            .form-group select,
-            .form-group textarea,
-            .form-group input[type="text"] {
-                font-size: 16px !important;
-                padding: 12px !important;
-                -webkit-appearance: none !important;
-            }
-
-            .classification-form {
-                padding: 15px !important;
-                margin-top: 15px !important;
-            }
-
-            #photo-preview {
-                max-height: 40vh !important;
-                width: 100% !important;
-                object-fit: contain !important;
-            }
-
-            .notification {
-                left: 10px !important;
-                right: 10px !important;
-                max-width: none !important;
-            }
-        }
-
-        /* 針對極小螢幕的額外優化 */
-        @media screen and (max-width: 480px) {
-            .container {
-                margin: 0 !important;
-                border-radius: 0 !important;
-            }
-
-            .tab-btn {
-                padding: 12px 6px !important;
-                font-size: 14px !important;
-            }
-
-            .camera-controls,
-            .edit-controls,
-            .save-controls {
-                gap: 6px !important;
-            }
-
-            .form-group {
-                margin-bottom: 12px !important;
-            }
-
-            .classification-form {
-                padding: 10px !important;
-            }
-        }
-
-        @media (min-width: 768px) {
-            .filters {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .question-item {
-                flex-direction: row;
-            }
-
-            .question-thumbnail {
-                width: 200px;
-                height: 120px;
+                width: 100%;
+                margin: 5px 0;
             }
         }
     </style>
@@ -727,63 +245,56 @@
     <div id="notification" class="notification"></div>
 
     <div class="container">
-        <h1>錯題庫資料庫 v2.0</h1>
+        <h1>eCoach - 智慧錯題管理</h1>
         
-        <div class="tabs">
+        <nav class="tabs">
             <button class="tab-btn active" data-tab="capture">📸 拍照/匯入</button>
-            <button class="tab-btn" data-tab="collection">📚 錯題庫</button>
-        </div>
+            <button class="tab-btn" data-tab="collection">📚 錯題集</button>
+        </nav>
         
-        <div class="tab-content" id="capture-tab">
-            <div class="camera-container">
-                <video id="camera" autoplay playsinline muted></video>
-                <canvas id="photo-canvas" class="hidden"></canvas>
-                <div class="camera-controls">
-                    <button id="capture-btn">📸 拍照</button>
-                    <button id="import-btn">📁 從相簿匯入</button>
-                    <button id="switch-camera-btn">🔄 切換相機</button>
-                    <input type="file" id="file-input" accept="image/*" class="hidden">
+        <main>
+            <section class="tab-content" id="capture-tab">
+                <div style="text-align: center;">
+                    <video id="camera" autoplay playsinline muted></video>
+                    <canvas id="photo-canvas" class="hidden"></canvas>
+                    
+                    <div>
+                        <button class="btn-primary" onclick="MistakeApp.capturePhoto()">📸 拍照</button>
+                        <button class="btn-secondary" onclick="document.getElementById('file-input').click()">📁 匯入圖片</button>
+                        <button class="btn-secondary" onclick="MistakeApp.switchCamera()">🔄 切換相機</button>
+                        <input type="file" id="file-input" accept="image/*" class="hidden">
+                    </div>
                 </div>
-            </div>
-            
-            <div class="edit-container hidden">
-                <h2>框選錯題</h2>
-                <div class="preview-container">
+                
+                <div id="edit-container" class="hidden" style="margin-top: 20px;">
                     <div style="position: relative; display: inline-block;">
-                        <img id="photo-preview" alt="預覽圖片">
+                        <img id="photo-preview" alt="預覽圖片" style="display: none;">
                     </div>
-                    <div class="image-info">
-                        <p>解析度: <span id="resolution">-</span></p>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <button class="btn-secondary" onclick="MistakeApp.startSelection('question')">📝 框選題目</button>
+                        <button class="btn-success" onclick="MistakeApp.startSelection('answer')">✅ 框選答案</button>
+                        <button class="btn-danger" onclick="MistakeApp.clearSelections()">🗑️ 清除框選</button>
                     </div>
-                </div>
-                
-                <div class="edit-controls">
-                    <button id="select-question-btn">📝 題目</button>
-                    <button id="select-answer-btn">✅ 答案</button>
-                    <button id="clear-selections-btn">🗑️ 清除</button>
-                    <button id="reset-btn">🔄 重設</button>
-                </div>
-                
-                <div class="classification-form hidden">
-                    <h3>錯題分類</h3>
                     
                     <div class="form-group">
-                        <label for="subject">科目:</label>
-                        <select id="subject" required>
-                            <option value="">請選擇科目</option>
+                        <label>科目:</label>
+                        <select id="subject" onchange="handleSubjectChange()">
+                            <option value="">請選擇</option>
                             <option value="chinese">國文</option>
                             <option value="english">英文</option>
                             <option value="math">數學</option>
                             <option value="science">自然</option>
                             <option value="social">社會</option>
-                            <option value="other">其他</option>
+                            <option value="custom">自訂科目...</option>
                         </select>
+                        <input type="text" id="custom-subject" placeholder="請輸入科目名稱" style="display: none; width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 10px; margin-top: 10px;">
                     </div>
                     
                     <div class="form-group">
-                        <label for="question-type">題型:</label>
-                        <select id="question-type" required>
-                            <option value="">請選擇題型</option>
+                        <label>題型:</label>
+                        <select id="question-type">
+                            <option value="">請選擇</option>
                             <option value="true-false">是非題</option>
                             <option value="multiple-choice">選擇題</option>
                             <option value="short-answer">簡答題</option>
@@ -794,9 +305,9 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="error-reason">錯誤原因:</label>
-                        <select id="error-reason" required>
-                            <option value="">請選擇錯誤原因</option>
+                        <label>錯誤原因:</label>
+                        <select id="error-reason">
+                            <option value="">請選擇</option>
                             <option value="dont-know">此題不會</option>
                             <option value="calculation-error">計算錯誤</option>
                             <option value="concept-error">觀念錯誤</option>
@@ -806,1103 +317,587 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="notes">筆記:</label>
-                        <textarea id="notes" placeholder="添加筆記或正確答案..." rows="4"></textarea>
+                        <label>筆記:</label>
+                        <textarea id="notes" placeholder="添加筆記..."></textarea>
                     </div>
                     
-                    <div class="save-controls">
-                        <button id="save-question-btn">💾 儲存錯題</button>
-                        <button id="cancel-btn">❌ 取消</button>
+                    <div style="text-align: center;">
+                        <button class="btn-success" onclick="MistakeApp.saveQuestion()">💾 儲存</button>
+                        <button class="btn-danger" onclick="MistakeApp.resetEdit()">❌ 取消</button>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <div class="tab-content hidden" id="collection-tab">
-            <div class="filter-container">
-                <h2>📚 錯題庫</h2>
-                
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <button id="export-btn" style="background: linear-gradient(45deg, #17a2b8, #138496); color: white; margin: 5px;">
-                        📤 匯出資料
-                    </button>
-                    <button id="import-btn-collection" style="background: linear-gradient(45deg, #6f42c1, #5a32a3); color: white; margin: 5px;">
-                        📥 匯入資料
-                    </button>
-                    <button id="clear-data-btn" style="background: linear-gradient(45deg, #dc3545, #c82333); color: white; margin: 5px;">
-                        🗑️ 清除資料
-                    </button>
-                    <input type="file" id="import-data-input" accept=".json" style="display: none;">
-                </div>
-                
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
-                    <p style="margin: 5px 0; color: #6c757d;">
-                        📊 總計：<span id="total-questions">0</span> 題錯題
-                        | 💾 儲存：<span id="storage-info">本機儲存</span>
-                    </p>
-                    <p style="margin: 5px 0; color: #6c757d; font-size: 12px;">
-                        💡 資料存在瀏覽器中，可匯出備份
-                    </p>
-                </div>
-                
-                <div class="filters">
-                    <div class="filter-group">
-                        <label for="filter-subject">科目:</label>
-                        <select id="filter-subject">
-                            <option value="all">全部科目</option>
-                            <option value="chinese">國文</option>
-                            <option value="english">英文</option>
-                            <option value="math">數學</option>
-                            <option value="science">自然</option>
-                            <option value="social">社會</option>
-                            <option value="other">其他</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label for="filter-type">題型:</label>
-                        <select id="filter-type">
-                            <option value="all">全部題型</option>
-                            <option value="true-false">是非題</option>
-                            <option value="multiple-choice">選擇題</option>
-                            <option value="short-answer">簡答題</option>
-                            <option value="essay">申論題</option>
-                            <option value="calculation">計算題</option>
-                            <option value="other">其他</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label for="filter-reason">錯誤原因:</label>
-                        <select id="filter-reason">
-                            <option value="all">全部原因</option>
-                            <option value="dont-know">此題不會</option>
-                            <option value="calculation-error">計算錯誤</option>
-                            <option value="concept-error">觀念錯誤</option>
-                            <option value="careless">粗心</option>
-                            <option value="other">其他</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+            </section>
             
-            <div class="questions-container">
-                <div class="no-questions">
-                    <p>📝 尚未添加任何錯題</p>
-                    <p style="font-size: 14px; margin-top: 10px; opacity: 0.7;">點擊「拍照/匯入」開始添加錯題吧！</p>
+            <section class="tab-content hidden" id="collection-tab">
+                <h2 style="text-align: center;">📚 錯題集</h2>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <button class="btn-secondary" onclick="MistakeApp.exportData()">📤 匯出</button>
+                    <button class="btn-secondary" onclick="document.getElementById('import-data-input').click()">📥 匯入</button>
+                    <button class="btn-danger" onclick="MistakeApp.clearAllData()">🗑️ 清除</button>
+                    <input type="file" id="import-data-input" accept=".json" class="hidden">
                 </div>
-            </div>
-        </div>
+                
+                <p style="text-align: center; color: var(--text-muted);">
+                    總計: <span id="total-questions">0</span> 題
+                </p>
+                
+                <div class="form-group">
+                    <label>篩選科目:</label>
+                    <select id="filter-subject" onchange="MistakeApp.filterQuestions()">
+                        <option value="all">全部</option>
+                        <option value="chinese">國文</option>
+                        <option value="english">英文</option>
+                        <option value="math">數學</option>
+                        <option value="science">自然</option>
+                        <option value="social">社會</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+                
+                <div id="questions-list">
+                    <p style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        尚未添加任何錯題
+                    </p>
+                </div>
+            </section>
+        </main>
     </div>
     
     <div id="question-modal" class="modal">
         <div class="modal-content">
-            <h2>
-                錯題詳情
-                <span class="close">×</span>
-            </h2>
-            <div class="question-details">
-                <img id="modal-image" alt="錯題圖片">
-                <div class="question-info">
-                    <p><strong>📚 科目:</strong> <span id="modal-subject"></span></p>
-                    <p><strong>📝 題型:</strong> <span id="modal-type"></span></p>
-                    <p><strong>❌ 錯誤原因:</strong> <span id="modal-reason"></span></p>
-                    <p><strong>📋 筆記:</strong></p>
-                    <div id="modal-notes" class="notes-content">暫無筆記</div>
-                </div>
-                <div class="modal-controls">
-                    <button id="edit-question-btn">✏️ 編輯</button>
-                    <button id="delete-question-btn">🗑️ 刪除</button>
-                </div>
+            <span class="close" onclick="MistakeApp.closeModal()">&times;</span>
+            <h2>錯題詳情</h2>
+            <img id="modal-image" style="width: 100%; border-radius: 10px;">
+            <p><strong>科目:</strong> <span id="modal-subject"></span></p>
+            <p><strong>題型:</strong> <span id="modal-type"></span></p>
+            <p><strong>錯誤原因:</strong> <span id="modal-reason"></span></p>
+            <p><strong>筆記:</strong></p>
+            <p id="modal-notes" style="background: var(--bg-light); padding: 10px; border-radius: 10px;"></p>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn-danger" onclick="MistakeApp.deleteQuestion()">🗑️ 刪除</button>
             </div>
         </div>
     </div>
     
     <script>
-        // 全域變數
-        let currentStream = null;
-        let facingMode = 'environment';
-        let questions = [];
-        let currentEditingId = null;
-        let selectionMode = false;
-        let selectionStart = null;
-        let selectionElement = null;
-        let selections = [];
-        let currentSelectionType = 'question';
+        const MistakeApp = (function() {
+            let currentStream = null;
+            let facingMode = 'environment';
+            let questions = [];
+            let currentQuestionId = null;
+            let selectionMode = false;
+            let selectionStart = null;
+            let selections = [];
+            let currentSelectionType = 'question';
 
-        // 初始化應用程式
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('初始化錯題集應用程式...');
-            initializeApp();
-        });
-
-        function initializeApp() {
-            try {
-                setupEventListeners();
+            // 初始化
+            document.addEventListener('DOMContentLoaded', function() {
                 loadQuestions();
-                initializeCamera();
-                console.log('應用程式初始化完成');
-            } catch (error) {
-                console.error('初始化失敗:', error);
-                showError('應用程式初始化失敗');
-            }
-        }
-
-        // 通知系統
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type} show`;
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        function showSuccess(message) {
-            showNotification(message, 'success');
-        }
-
-        function showError(message) {
-            showNotification(message, 'error');
-        }
-
-        // 資料載入和儲存
-        function loadQuestions() {
-            try {
-                const saved = localStorage.getItem('mistake-questions');
-                questions = saved ? JSON.parse(saved) : [];
-                updateStorageInfo();
-                console.log('載入錯題數量:', questions.length);
-            } catch (error) {
-                console.error('載入錯題失敗:', error);
-                questions = [];
-                showError('載入資料失敗');
-            }
-        }
-
-        function saveQuestions() {
-            try {
-                localStorage.setItem('mistake-questions', JSON.stringify(questions));
-                updateStorageInfo();
-                console.log('儲存錯題數量:', questions.length);
-                return true;
-            } catch (error) {
-                console.error('儲存失敗:', error);
-                showError('儲存失敗');
-                return false;
-            }
-        }
-
-        // 事件監聽器設定
-        function setupEventListeners() {
-            // 標籤頁切換
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+                initCamera();
+                setupFileInput();
+                setupImportData();
+                setupSubjectHandler();
             });
 
-            // 相機控制
-            document.getElementById('capture-btn').addEventListener('click', capturePhoto);
-            document.getElementById('import-btn').addEventListener('click', () => {
-                document.getElementById('file-input').click();
-            });
-            document.getElementById('switch-camera-btn').addEventListener('click', switchCamera);
-            document.getElementById('file-input').addEventListener('change', handleFileImport);
-
-            // 框選控制
-            document.getElementById('select-question-btn').addEventListener('click', () => startSelection('question'));
-            document.getElementById('select-answer-btn').addEventListener('click', () => startSelection('answer'));
-            document.getElementById('clear-selections-btn').addEventListener('click', clearAllSelections);
-            document.getElementById('reset-btn').addEventListener('click', resetEdit);
-
-            // 表單控制
-            document.getElementById('save-question-btn').addEventListener('click', saveQuestion);
-            document.getElementById('cancel-btn').addEventListener('click', cancelEdit);
-
-            // 過濾器
-            document.getElementById('filter-subject').addEventListener('change', filterQuestions);
-            document.getElementById('filter-type').addEventListener('change', filterQuestions);
-            document.getElementById('filter-reason').addEventListener('change', filterQuestions);
-
-            // 資料管理
-            document.getElementById('export-btn').addEventListener('click', exportData);
-            document.getElementById('import-btn-collection').addEventListener('click', () => {
-                document.getElementById('import-data-input').click();
-            });
-            document.getElementById('import-data-input').addEventListener('change', importData);
-            document.getElementById('clear-data-btn').addEventListener('click', clearAllData);
-
-            // 模態框
-            document.querySelector('.close').addEventListener('click', closeModal);
-            document.getElementById('edit-question-btn').addEventListener('click', editQuestion);
-            document.getElementById('delete-question-btn').addEventListener('click', deleteQuestion);
-            
-            // 點擊模態框外部關閉
-            window.addEventListener('click', (e) => {
-                const modal = document.getElementById('question-modal');
-                if (e.target === modal) {
-                    closeModal();
-                }
-            });
-        }
-
-        // 標籤頁切換
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-            document.getElementById(`${tabName}-tab`).classList.remove('hidden');
-
-            if (tabName === 'collection') {
-                displayQuestions();
-            }
-        }
-
-        // 相機功能 - 加強權限請求版本
-        async function initializeCamera() {
-            const video = document.getElementById('camera');
-            
-            // 先檢查基本支援
-            if (!navigator.mediaDevices?.getUserMedia) {
-                console.log('瀏覽器不支援相機');
-                handleCameraUnavailable();
-                return;
-            }
-
-            // 顯示載入狀態
-            video.style.background = '#f0f0f0';
-            video.style.display = 'flex';
-            video.style.alignItems = 'center';
-            video.style.justifyContent = 'center';
-            video.innerHTML = '<div style="color: #666; text-align: center; padding: 20px;">正在啟動相機...</div>';
-
-            try {
-                await startCamera();
-            } catch (error) {
-                console.error('相機初始化失敗:', error);
-                handleCameraUnavailable();
-            }
-        }
-
-        async function startCamera() {
-            // 停止現有串流
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-                currentStream = null;
-            }
-
-            try {
-                // 修正比例的相機約束
-                const constraints = {
-                    video: {
-                        facingMode: facingMode,
-                        width: { ideal: 1280, max: 1920 },
-                        height: { ideal: 960, max: 1440 },
-                        aspectRatio: { ideal: 4/3 }
+            function setupSubjectHandler() {
+                window.handleSubjectChange = function() {
+                    const select = document.getElementById('subject');
+                    const customInput = document.getElementById('custom-subject');
+                    
+                    if (select.value === 'custom') {
+                        customInput.style.display = 'block';
+                        customInput.focus();
+                    } else {
+                        customInput.style.display = 'none';
+                        customInput.value = '';
                     }
                 };
+            }
 
-                console.log('請求相機權限...');
-                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-                
-                const video = document.getElementById('camera');
-                video.srcObject = currentStream;
-                video.style.background = 'none';
-                video.innerHTML = '';
-                
-                return new Promise((resolve, reject) => {
-                    video.onloadedmetadata = () => {
-                        video.play()
-                            .then(() => {
-                                console.log('相機啟動成功, 解析度:', video.videoWidth, 'x', video.videoHeight);
-                                showSuccess('相機已就緒');
-                                resolve();
-                            })
-                            .catch(reject);
+            function setupFileInput() {
+                document.getElementById('file-input').addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            showPhotoPreview(event.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            function setupImportData() {
+                document.getElementById('import-data-input').addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (data.questions && Array.isArray(data.questions)) {
+                                if (confirm(`即將匯入 ${data.questions.length} 筆錯題，確定繼續？`)) {
+                                    questions = [...questions, ...data.questions];
+                                    saveQuestions();
+                                    displayQuestions();
+                                    showNotification('資料已匯入');
+                                }
+                            }
+                        } catch (error) {
+                            showNotification('匯入失敗', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                    e.target.value = '';
+                });
+            }
+
+            function showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type} show`;
+                setTimeout(() => notification.classList.remove('show'), 3000);
+            }
+
+            function loadQuestions() {
+                const saved = localStorage.getItem('questions');
+                questions = saved ? JSON.parse(saved) : [];
+                updateDisplay();
+            }
+
+            function saveQuestions() {
+                localStorage.setItem('questions', JSON.stringify(questions));
+                updateDisplay();
+            }
+
+            async function initCamera() {
+                try {
+                    // 檢查瀏覽器支援
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        showNotification('此瀏覽器不支援相機功能，請使用匯入功能', 'error');
+                        disableCameraButtons();
+                        return;
+                    }
+
+                    // 檢查權限狀態（如果支援）
+                    if (navigator.permissions && navigator.permissions.query) {
+                        try {
+                            const permissionStatus = await navigator.permissions.query({ name: 'camera' });
+                            
+                            if (permissionStatus.state === 'denied') {
+                                showNotification('相機權限已被拒絕，請在瀏覽器設定中開啟相機權限', 'error');
+                                disableCameraButtons();
+                                showCameraPermissionGuide();
+                                return;
+                            }
+                        } catch (e) {
+                            console.log('無法查詢權限狀態:', e);
+                        }
+                    }
+
+                    // 請求相機權限
+                    const constraints = { 
+                        video: { 
+                            facingMode: facingMode,
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        } 
                     };
                     
-                    video.onerror = reject;
+                    currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    const video = document.getElementById('camera');
+                    video.srcObject = currentStream;
                     
-                    // 5秒超時
-                    setTimeout(() => reject(new Error('相機啟動超時')), 5000);
-                });
-                
-            } catch (error) {
-                throw error;
-            }
-        }
-
-        function handleCameraUnavailable() {
-            const video = document.getElementById('camera');
-            video.style.background = 'linear-gradient(45deg, #f8f9fa, #e9ecef)';
-            video.innerHTML = `
-                <div style="color: #666; text-align: center; padding: 40px 20px;">
-                    <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
-                    <div>相機無法使用</div>
-                    <div style="font-size: 12px; margin-top: 5px;">請使用下方檔案匯入功能</div>
-                </div>
-            `;
-            
-            // 禁用相機按鈕
-            document.getElementById('capture-btn').disabled = true;
-            document.getElementById('switch-camera-btn').disabled = true;
-            
-            // 突出檔案匯入
-            const importBtn = document.getElementById('import-btn');
-            importBtn.style.background = 'linear-gradient(45deg, #ff6b6b, #ee5a52)';
-            importBtn.style.transform = 'scale(1.05)';
-        }
-
-        async function switchCamera() {
-            if (document.getElementById('switch-camera-btn').disabled) {
-                showNotification('請點擊下方檔案匯入按鈕');
-                return;
-            }
-            
-            facingMode = facingMode === 'environment' ? 'user' : 'environment';
-            
-            try {
-                await startCamera();
-                showSuccess(`已切換到${facingMode === 'environment' ? '後' : '前'}鏡頭`);
-            } catch (error) {
-                console.error('切換相機失敗:', error);
-                facingMode = facingMode === 'environment' ? 'user' : 'environment';
-                showNotification('相機切換失敗，請使用檔案匯入');
-            }
-        }
-
-        function capturePhoto() {
-            if (document.getElementById('capture-btn').disabled) {
-                document.getElementById('file-input').click();
-                return;
-            }
-            
-            try {
-                const video = document.getElementById('camera');
-                
-                if (!currentStream || video.videoWidth === 0) {
-                    showNotification('相機未就緒，請使用檔案匯入');
-                    document.getElementById('file-input').click();
-                    return;
+                    console.log('相機初始化成功');
+                    showNotification('相機已開啟');
+                } catch (error) {
+                    console.error('相機錯誤:', error);
+                    handleCameraError(error);
                 }
+            }
 
+            function handleCameraError(error) {
+                let errorMessage = '無法開啟相機';
+                
+                if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                    errorMessage = '請允許相機權限';
+                    showCameraPermissionGuide();
+                } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+                    errorMessage = '找不到相機裝置，請使用匯入功能';
+                } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+                    errorMessage = '相機正被其他應用程式使用';
+                } else if (error.name === 'OverconstrainedError') {
+                    errorMessage = '相機不支援所需的設定';
+                } else if (error.name === 'SecurityError') {
+                    errorMessage = '請使用 HTTPS 或 localhost 開啟此頁面';
+                }
+                
+                showNotification(errorMessage, 'error');
+                disableCameraButtons();
+            }
+
+            function disableCameraButtons() {
+                const captureBtn = document.getElementById('capture-btn');
+                const switchBtn = document.getElementById('switch-camera-btn');
+                if (captureBtn) captureBtn.disabled = true;
+                if (switchBtn) switchBtn.disabled = true;
+            }
+
+            function showCameraPermissionGuide() {
+                const guide = document.createElement('div');
+                guide.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #fff;
+                    padding: 20px;
+                    border-radius: 15px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                    max-width: 90%;
+                    z-index: 2000;
+                `;
+                
+                guide.innerHTML = `
+                    <h3 style="margin-bottom: 10px; color: var(--primary-start);">📱 如何開啟相機權限</h3>
+                    <p style="margin-bottom: 10px; font-size: 14px; line-height: 1.5;">
+                        <strong>Chrome/Edge:</strong> 點擊網址列左側的 🔒 或 ⓘ 圖示 → 相機 → 允許<br>
+                        <strong>Safari (iOS):</strong> 設定 → Safari → 相機 → 允許<br>
+                        <strong>Safari (Mac):</strong> Safari → 偏好設定 → 網站 → 相機
+                    </p>
+                    <button onclick="this.parentElement.remove()" style="width: 100%; padding: 10px; background: var(--primary-start); color: white; border: none; border-radius: 10px; cursor: pointer;">
+                        知道了
+                    </button>
+                `;
+                
+                document.body.appendChild(guide);
+                
+                setTimeout(() => {
+                    if (guide.parentElement) {
+                        guide.remove();
+                    }
+                }, 15000);
+            }
+
+            async function switchCamera() {
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                }
+                facingMode = facingMode === 'environment' ? 'user' : 'environment';
+                await initCamera();
+            }
+
+            function capturePhoto() {
+                const video = document.getElementById('camera');
                 const canvas = document.getElementById('photo-canvas');
                 const ctx = canvas.getContext('2d');
 
-                // 使用實際視訊尺寸，確保比例一致
-                const videoWidth = video.videoWidth;
-                const videoHeight = video.videoHeight;
-                
-                canvas.width = videoWidth;
-                canvas.height = videoHeight;
-                
-                // 清除畫布並繪製
-                ctx.clearRect(0, 0, videoWidth, videoHeight);
-                ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0);
 
-                canvas.toBlob(blob => {
-                    if (blob) {
-                        displayPhotoPreview(blob);
-                        showSuccess(`拍照成功 (${videoWidth}x${videoHeight})`);
-                        
-                        // 顯示實際拍攝資訊
-                        const imgObj = new Image();
-                        imgObj.onload = function() {
-                            document.getElementById('resolution').textContent = 
-                                `${this.width} x ${this.height}`;
-                        };
-                        imgObj.src = URL.createObjectURL(blob);
-                    } else {
-                        document.getElementById('file-input').click();
-                    }
-                }, 'image/jpeg', 0.9);
-                
-            } catch (error) {
-                console.error('拍照失敗:', error);
-                document.getElementById('file-input').click();
+                const imageData = canvas.toDataURL('image/jpeg', 0.8);
+                showPhotoPreview(imageData);
             }
-        }
 
-        // 添加手動請求相機權限的按鈕功能
-        function requestCameraPermission() {
-            if (!navigator.mediaDevices?.getUserMedia) {
-                showError('此瀏覽器不支援相機功能');
-                return;
+            function showPhotoPreview(imageData) {
+                const preview = document.getElementById('photo-preview');
+                preview.src = imageData;
+                preview.dataset.imageData = imageData;
+                preview.style.display = 'block';
+                document.getElementById('edit-container').classList.remove('hidden');
+                selections = [];
+                showNotification('圖片載入成功');
             }
-            
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    // 立即停止以釋放資源
-                    stream.getTracks().forEach(track => track.stop());
-                    // 重新初始化
-                    initializeCamera();
-                })
-                .catch(error => {
-                    if (error.name === 'NotAllowedError') {
-                        showError('請在瀏覽器設定中允許相機權限');
-                    } else {
-                        showError('無法存取相機：' + error.message);
-                    }
-                });
-        }
 
-        function handleFileImport(event) {
-            try {
-                const file = event.target.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    displayPhotoPreview(file);
-                } else {
-                    showError('請選擇有效的圖片檔案');
+            function startSelection(type) {
+                currentSelectionType = type;
+                selectionMode = true;
+                
+                const img = document.getElementById('photo-preview');
+                img.style.cursor = 'crosshair';
+                img.addEventListener('mousedown', handleSelectionStart);
+                
+                showNotification(`請框選${type === 'question' ? '題目' : '答案'}區域`);
+            }
+
+            function handleSelectionStart(e) {
+                const rect = e.target.getBoundingClientRect();
+                selectionStart = {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
+                };
+
+                const overlay = document.createElement('div');
+                overlay.className = `selection-overlay ${currentSelectionType}`;
+                overlay.style.left = selectionStart.x + 'px';
+                overlay.style.top = selectionStart.y + 'px';
+                e.target.parentElement.appendChild(overlay);
+                
+                document.addEventListener('mousemove', updateSelection);
+                document.addEventListener('mouseup', endSelection);
+                
+                function updateSelection(e) {
+                    const currentX = e.clientX - rect.left;
+                    const currentY = e.clientY - rect.top;
+                    
+                    overlay.style.width = Math.abs(currentX - selectionStart.x) + 'px';
+                    overlay.style.height = Math.abs(currentY - selectionStart.y) + 'px';
+                    overlay.style.left = Math.min(selectionStart.x, currentX) + 'px';
+                    overlay.style.top = Math.min(selectionStart.y, currentY) + 'px';
                 }
-            } catch (error) {
-                console.error('檔案處理失敗:', error);
-                showError('檔案處理失敗');
-            }
-        }
-
-        function displayPhotoPreview(imageFile) {
-            try {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById('photo-preview');
-                    img.src = e.target.result;
-                    img.dataset.imageData = e.target.result;
-
-                    selections = [];
-                    selectionMode = false;
-                    currentSelectionType = 'question';
-
-                    document.querySelector('.edit-container').classList.remove('hidden');
-
-                    const imgObj = new Image();
-                    imgObj.onload = function() {
-                        document.getElementById('resolution').textContent = 
-                            `${this.width} x ${this.height}`;
-                    };
-                    imgObj.src = e.target.result;
-
-                    clearAllSelections();
-                    document.querySelector('.classification-form').classList.add('hidden');
-
-                    document.querySelector('.edit-container').scrollIntoView({ 
-                        behavior: 'smooth' 
+                
+                function endSelection() {
+                    document.removeEventListener('mousemove', updateSelection);
+                    document.removeEventListener('mouseup', endSelection);
+                    
+                    selections.push({
+                        type: currentSelectionType,
+                        bounds: {
+                            left: parseInt(overlay.style.left),
+                            top: parseInt(overlay.style.top),
+                            width: parseInt(overlay.style.width),
+                            height: parseInt(overlay.style.height)
+                        }
                     });
-
-                    showSuccess('圖片載入成功');
-                };
-                
-                reader.onerror = function() {
-                    showError('圖片載入失敗');
-                };
-                
-                reader.readAsDataURL(imageFile);
-            } catch (error) {
-                console.error('圖片預覽失敗:', error);
-                showError('圖片預覽失敗');
-            }
-        }
-
-        // 框選功能
-        function startSelection(type) {
-            currentSelectionType = type;
-            selectionMode = true;
-            
-            updateSelectionButtons();
-            enableSelection();
-            
-            showNotification(`請在圖片上拖拉選取${type === 'question' ? '題目' : '答案'}區域`);
-        }
-
-        function updateSelectionButtons() {
-            const questionBtn = document.getElementById('select-question-btn');
-            const answerBtn = document.getElementById('select-answer-btn');
-            
-            if (selectionMode) {
-                if (currentSelectionType === 'question') {
-                    questionBtn.textContent = '選取中...';
-                    questionBtn.style.background = 'linear-gradient(45deg, #ffc107, #ff8f00)';
-                } else {
-                    answerBtn.textContent = '選取中...';
-                    answerBtn.style.background = 'linear-gradient(45deg, #ffc107, #ff8f00)';
+                    
+                    selectionMode = false;
+                    e.target.style.cursor = 'default';
+                    e.target.removeEventListener('mousedown', handleSelectionStart);
                 }
-            } else {
-                questionBtn.textContent = '題目';
-                questionBtn.style.background = 'linear-gradient(45deg, #667eea, #764ba2)';
-                answerBtn.textContent = '答案';
-                answerBtn.style.background = 'linear-gradient(45deg, #28a745, #20c997)';
             }
-        }
 
-        function enableSelection() {
-            const img = document.getElementById('photo-preview');
-            img.addEventListener('mousedown', handleSelectionStart);
-            img.addEventListener('touchstart', handleSelectionStart);
-            img.style.cursor = 'crosshair';
-        }
+            function clearSelections() {
+                const container = document.getElementById('photo-preview').parentElement;
+                container.querySelectorAll('.selection-overlay').forEach(el => el.remove());
+                selections = [];
+                showNotification('已清除框選');
+            }
 
-        function disableSelection() {
-            const img = document.getElementById('photo-preview');
-            img.style.cursor = 'default';
-            img.removeEventListener('mousedown', handleSelectionStart);
-            img.removeEventListener('touchstart', handleSelectionStart);
-        }
-
-        function handleSelectionStart(e) {
-            e.preventDefault();
-            const rect = e.target.getBoundingClientRect();
-            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-            
-            selectionStart = {
-                x: clientX - rect.left,
-                y: clientY - rect.top
-            };
-
-            createSelectionOverlay(e.target.parentElement);
-            
-            document.addEventListener('mousemove', updateSelection);
-            document.addEventListener('touchmove', updateSelection);
-            document.addEventListener('mouseup', handleSelectionEnd);
-            document.addEventListener('touchend', handleSelectionEnd);
-        }
-
-        function createSelectionOverlay(container) {
-            selectionElement = document.createElement('div');
-            selectionElement.className = `selection-overlay ${currentSelectionType}`;
-            selectionElement.dataset.type = currentSelectionType === 'question' ? '題目' : '答案';
-            container.appendChild(selectionElement);
-        }
-
-        function updateSelection(e) {
-            if (!selectionStart || !selectionElement) return;
-            
-            const img = document.getElementById('photo-preview');
-            const rect = img.getBoundingClientRect();
-            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-            
-            const currentX = clientX - rect.left;
-            const currentY = clientY - rect.top;
-            
-            const left = Math.min(selectionStart.x, currentX);
-            const top = Math.min(selectionStart.y, currentY);
-            const width = Math.abs(currentX - selectionStart.x);
-            const height = Math.abs(currentY - selectionStart.y);
-            
-            selectionElement.style.left = left + 'px';
-            selectionElement.style.top = top + 'px';
-            selectionElement.style.width = width + 'px';
-            selectionElement.style.height = height + 'px';
-        }
-
-        function handleSelectionEnd() {
-            document.removeEventListener('mousemove', updateSelection);
-            document.removeEventListener('touchmove', updateSelection);
-            document.removeEventListener('mouseup', handleSelectionEnd);
-            document.removeEventListener('touchend', handleSelectionEnd);
-            
-            if (selectionElement) {
-                const selection = {
-                    type: currentSelectionType,
-                    element: selectionElement,
-                    bounds: {
-                        left: parseInt(selectionElement.style.left),
-                        top: parseInt(selectionElement.style.top),
-                        width: parseInt(selectionElement.style.width),
-                        height: parseInt(selectionElement.style.height)
+            function saveQuestion() {
+                const subjectSelect = document.getElementById('subject');
+                const customSubjectInput = document.getElementById('custom-subject');
+                let subject = subjectSelect.value;
+                
+                // 處理自訂科目
+                if (subject === 'custom') {
+                    const customSubject = customSubjectInput.value.trim();
+                    if (!customSubject) {
+                        showNotification('請輸入科目名稱', 'error');
+                        customSubjectInput.focus();
+                        return;
                     }
-                };
+                    subject = 'custom:' + customSubject;
+                }
                 
-                selections.push(selection);
-                
-                selectionMode = false;
-                updateSelectionButtons();
-                disableSelection();
-                
-                showNotification(`${currentSelectionType === 'question' ? '題目' : '答案'}區域已選取`);
-                
-                checkShowClassificationForm();
-            }
-        }
-
-        function checkShowClassificationForm() {
-            const hasQuestion = selections.some(s => s.type === 'question');
-            const hasAnswer = selections.some(s => s.type === 'answer');
-            
-            if (hasQuestion || hasAnswer) {
-                showClassificationForm();
-            }
-        }
-
-        function clearAllSelections() {
-            const container = document.getElementById('photo-preview').parentElement;
-            const overlays = container.querySelectorAll('.selection-overlay');
-            overlays.forEach(overlay => overlay.remove());
-            
-            selections = [];
-            selectionMode = false;
-            selectionStart = null;
-            selectionElement = null;
-            
-            updateSelectionButtons();
-            disableSelection();
-            
-            showNotification('已清除所有選取');
-        }
-
-        function showClassificationForm() {
-            document.querySelector('.classification-form').classList.remove('hidden');
-            document.querySelector('.classification-form').scrollIntoView({ 
-                behavior: 'smooth' 
-            });
-        }
-
-        function resetEdit() {
-            document.querySelector('.edit-container').classList.add('hidden');
-            
-            selections = [];
-            selectionMode = false;
-            selectionStart = null;
-            selectionElement = null;
-            currentEditingId = null;
-            currentSelectionType = 'question';
-            
-            resetForm();
-            updateSelectionButtons();
-            
-            document.getElementById('file-input').value = '';
-        }
-
-        function resetForm() {
-            document.getElementById('subject').value = '';
-            document.getElementById('question-type').value = '';
-            document.getElementById('error-reason').value = '';
-            document.getElementById('notes').value = '';
-            document.querySelector('.classification-form').classList.add('hidden');
-        }
-
-        // 錯題管理
-        function saveQuestion() {
-            try {
-                const subject = document.getElementById('subject').value;
                 const questionType = document.getElementById('question-type').value;
                 const errorReason = document.getElementById('error-reason').value;
                 const notes = document.getElementById('notes').value;
                 const imageData = document.getElementById('photo-preview').dataset.imageData;
 
                 if (!subject || !questionType || !errorReason) {
-                    showError('請填寫所有必填欄位');
+                    showNotification('請填寫所有欄位', 'error');
                     return;
                 }
 
-                if (!imageData) {
-                    showError('請先拍照或匯入圖片');
-                    return;
-                }
-
-                const selectionData = selections.map(s => ({
-                    type: s.type,
-                    bounds: s.bounds
-                }));
-
-                const question = {
-                    id: currentEditingId || Date.now().toString(),
+                questions.push({
+                    id: Date.now().toString(),
                     subject,
                     questionType,
                     errorReason,
                     notes,
                     imageData,
-                    selections: selectionData,
-                    createdAt: currentEditingId ? 
-                        questions.find(q => q.id === currentEditingId)?.createdAt || new Date().toISOString() :
-                        new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                };
+                    selections,
+                    createdAt: new Date().toISOString()
+                });
 
-                if (currentEditingId) {
-                    const index = questions.findIndex(q => q.id === currentEditingId);
-                    if (index !== -1) {
-                        questions[index] = question;
-                    }
-                } else {
-                    questions.push(question);
-                }
-
-                if (saveQuestions()) {
-                    showSuccess(currentEditingId ? '錯題已更新' : '錯題已儲存');
-                    setTimeout(() => {
-                        resetEdit();
-                    }, 500);
-                }
-                
-            } catch (error) {
-                console.error('儲存錯題失敗:', error);
-                showError('儲存失敗');
+                saveQuestions();
+                showNotification('錯題已儲存');
+                resetEdit();
             }
-        }
 
-        function cancelEdit() {
-            resetEdit();
-        }
+            function resetEdit() {
+                document.getElementById('edit-container').classList.add('hidden');
+                document.getElementById('subject').value = '';
+                document.getElementById('question-type').value = '';
+                document.getElementById('error-reason').value = '';
+                document.getElementById('notes').value = '';
+                clearSelections();
+            }
 
-        function displayQuestions() {
-            try {
-                const container = document.querySelector('.questions-container');
-                
-                updateStorageInfo();
+            function displayQuestions() {
+                const container = document.getElementById('questions-list');
                 
                 if (questions.length === 0) {
-                    container.innerHTML = `
-                        <div class="no-questions">
-                            <p>尚未添加任何錯題</p>
-                            <p style="font-size: 14px; margin-top: 10px; opacity: 0.7;">點擊「拍照/匯入」開始添加錯題吧！</p>
-                        </div>
-                    `;
+                    container.innerHTML = '<p style="text-align: center; padding: 40px; color: var(--text-muted);">尚未添加任何錯題</p>';
                     return;
                 }
 
-                const html = questions.map(question => `
-                    <div class="question-item" onclick="showQuestionModal('${question.id}')">
-                        <img src="${question.imageData}" alt="錯題圖片" class="question-thumbnail">
-                        <div class="question-info">
-                            <div class="question-tags">
-                                <span class="tag">${getSubjectName(question.subject)}</span>
-                                <span class="tag">${getQuestionTypeName(question.questionType)}</span>
-                                <span class="tag">${getErrorReasonName(question.errorReason)}</span>
-                            </div>
-                            <div class="question-notes">${question.notes || '無筆記'}</div>
-                        </div>
+                container.innerHTML = questions.map(q => `
+                    <div class="question-item" onclick="MistakeApp.showModal('${q.id}')">
+                        <img src="${q.imageData}" alt="錯題">
+                        <p><strong>${getSubjectName(q.subject)}</strong> - ${getTypeName(q.questionType)}</p>
+                        <p style="color: var(--text-muted); font-size: 14px;">${escapeHtml(q.notes) || '無筆記'}</p>
                     </div>
                 `).join('');
-
-                container.innerHTML = html;
-                console.log('顯示錯題:', questions.length, '筆');
-            } catch (error) {
-                console.error('顯示錯題失敗:', error);
-                showError('顯示錯題失敗');
-            }
-        }
-
-        function filterQuestions() {
-            const subjectFilter = document.getElementById('filter-subject').value;
-            const typeFilter = document.getElementById('filter-type').value;
-            const reasonFilter = document.getElementById('filter-reason').value;
-
-            let filteredQuestions = questions;
-
-            if (subjectFilter !== 'all') {
-                filteredQuestions = filteredQuestions.filter(q => q.subject === subjectFilter);
             }
 
-            if (typeFilter !== 'all') {
-                filteredQuestions = filteredQuestions.filter(q => q.questionType === typeFilter);
-            }
-
-            if (reasonFilter !== 'all') {
-                filteredQuestions = filteredQuestions.filter(q => q.errorReason === reasonFilter);
-            }
-
-            displayFilteredQuestions(filteredQuestions);
-        }
-
-        function displayFilteredQuestions(filteredQuestions) {
-            const container = document.querySelector('.questions-container');
-            
-            if (filteredQuestions.length === 0) {
-                container.innerHTML = `
-                    <div class="no-questions">
-                        <p>沒有符合條件的錯題</p>
-                        <p style="font-size: 14px; margin-top: 10px; opacity: 0.7;">試著調整過濾條件</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const html = filteredQuestions.map(question => `
-                <div class="question-item" onclick="showQuestionModal('${question.id}')">
-                    <img src="${question.imageData}" alt="錯題圖片" class="question-thumbnail">
-                    <div class="question-info">
-                        <div class="question-tags">
-                            <span class="tag">${getSubjectName(question.subject)}</span>
-                            <span class="tag">${getQuestionTypeName(question.questionType)}</span>
-                            <span class="tag">${getErrorReasonName(question.errorReason)}</span>
-                        </div>
-                        <div class="question-notes">${question.notes || '無筆記'}</div>
-                    </div>
-                </div>
-            `).join('');
-
-            container.innerHTML = html;
-        }
-
-        // 模態框功能
-        function showQuestionModal(questionId) {
-            const question = questions.find(q => q.id === questionId);
-            if (!question) return;
-
-            document.getElementById('modal-image').src = question.imageData;
-            document.getElementById('modal-subject').textContent = getSubjectName(question.subject);
-            document.getElementById('modal-type').textContent = getQuestionTypeName(question.questionType);
-            document.getElementById('modal-reason').textContent = getErrorReasonName(question.errorReason);
-            document.getElementById('modal-notes').textContent = question.notes || '暫無筆記';
-
-            document.getElementById('question-modal').style.display = 'block';
-            currentEditingId = questionId;
-        }
-
-        function closeModal() {
-            document.getElementById('question-modal').style.display = 'none';
-            currentEditingId = null;
-        }
-
-        function editQuestion() {
-            const question = questions.find(q => q.id === currentEditingId);
-            if (!question) return;
-
-            switchTab('capture');
-
-            const img = document.getElementById('photo-preview');
-            img.src = question.imageData;
-            img.dataset.imageData = question.imageData;
-
-            document.querySelector('.edit-container').classList.remove('hidden');
-
-            if (question.selections) {
-                selections = [];
-                const container = img.parentElement;
+            function filterQuestions() {
+                const filter = document.getElementById('filter-subject').value;
+                const filtered = filter === 'all' ? questions : questions.filter(q => q.subject === filter);
                 
-                const existingOverlays = container.querySelectorAll('.selection-overlay');
-                existingOverlays.forEach(overlay => overlay.remove());
-                
-                question.selections.forEach(selectionData => {
-                    const overlay = document.createElement('div');
-                    overlay.className = `selection-overlay ${selectionData.type}`;
-                    overlay.dataset.type = selectionData.type === 'question' ? '題目' : '答案';
-                    overlay.style.left = selectionData.bounds.left + 'px';
-                    overlay.style.top = selectionData.bounds.top + 'px';
-                    overlay.style.width = selectionData.bounds.width + 'px';
-                    overlay.style.height = selectionData.bounds.height + 'px';
-                    container.appendChild(overlay);
-                    
-                    selections.push({
-                        type: selectionData.type,
-                        element: overlay,
-                        bounds: selectionData.bounds
-                    });
-                });
-            }
-
-            document.getElementById('subject').value = question.subject;
-            document.getElementById('question-type').value = question.questionType;
-            document.getElementById('error-reason').value = question.errorReason;
-            document.getElementById('notes').value = question.notes;
-
-            showClassificationForm();
-            closeModal();
-        }
-
-        function deleteQuestion() {
-            if (!currentEditingId) {
-                showError('無法刪除：找不到題目ID');
-                closeModal();
-                return;
-            }
-            
-            const confirmed = confirm('確定要刪除這個錯題嗎？此操作無法復原。');
-            if (confirmed) {
-                try {
-                    const originalLength = questions.length;
-                    
-                    // 找到並刪除問題
-                    questions = questions.filter(q => q.id !== currentEditingId);
-                    
-                    if (questions.length < originalLength) {
-                        // 立即儲存更改
-                        if (saveQuestions()) {
-                            showSuccess('錯題已刪除');
-                            closeModal();
-                            displayQuestions();
-                            console.log('成功刪除題目，剩餘:', questions.length, '題');
-                        } else {
-                            showError('刪除失敗：無法儲存更改');
-                        }
-                    } else {
-                        showError('刪除失敗：找不到指定的題目');
-                    }
-                } catch (error) {
-                    console.error('刪除題目時發生錯誤:', error);
-                    showError('刪除失敗：' + error.message);
-                }
-            }
-        }
-
-        // 資料管理功能
-        function exportData() {
-            try {
-                if (questions.length === 0) {
-                    showError('沒有資料可以匯出');
+                const container = document.getElementById('questions-list');
+                if (filtered.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; padding: 40px; color: var(--text-muted);">沒有符合條件的錯題</p>';
                     return;
                 }
+
+                container.innerHTML = filtered.map(q => `
+                    <div class="question-item" onclick="MistakeApp.showModal('${q.id}')">
+                        <img src="${q.imageData}" alt="錯題">
+                        <p><strong>${getSubjectName(q.subject)}</strong> - ${getTypeName(q.questionType)}</p>
+                        <p style="color: var(--text-muted); font-size: 14px;">${escapeHtml(q.notes) || '無筆記'}</p>
+                    </div>
+                `).join('');
+            }
+
+            function showModal(id) {
+                const question = questions.find(q => q.id === id);
+                if (!question) return;
+
+                currentQuestionId = id;
+                document.getElementById('modal-image').src = question.imageData;
+                document.getElementById('modal-subject').textContent = getSubjectName(question.subject);
+                document.getElementById('modal-type').textContent = getTypeName(question.questionType);
+                document.getElementById('modal-reason').textContent = getReasonName(question.errorReason);
+                document.getElementById('modal-notes').textContent = question.notes || '無筆記';
+                document.getElementById('question-modal').style.display = 'block';
+            }
+
+            function closeModal() {
+                document.getElementById('question-modal').style.display = 'none';
+                currentQuestionId = null;
+            }
+
+            function deleteQuestion() {
+                if (!confirm('確定要刪除？')) return;
                 
-                const exportData = {
-                    version: '2.0',
-                    exportDate: new Date().toISOString(),
-                    questionsCount: questions.length,
-                    questions: questions
-                };
-                
-                const dataStr = JSON.stringify(exportData, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                
-                const url = URL.createObjectURL(dataBlob);
+                questions = questions.filter(q => q.id !== currentQuestionId);
+                saveQuestions();
+                closeModal();
+                displayQuestions();
+                showNotification('已刪除');
+            }
+
+            function exportData() {
+                if (questions.length === 0) {
+                    showNotification('沒有資料', 'error');
+                    return;
+                }
+
+                const data = JSON.stringify({ questions, exportDate: new Date().toISOString() }, null, 2);
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `錯題集備份_${new Date().toISOString().split('T')[0]}.json`;
+                a.download = `錯題集_${new Date().toISOString().split('T')[0]}.json`;
                 a.click();
-                
                 URL.revokeObjectURL(url);
-                showSuccess(`已匯出 ${questions.length} 筆錯題`);
-            } catch (error) {
-                console.error('匯出失敗:', error);
-                showError('匯出失敗');
+                showNotification('已匯出');
             }
-        }
-        
-        function importData(event) {
-            try {
-                const file = event.target.files[0];
-                if (!file) return;
+
+            function clearAllData() {
+                if (!confirm('確定要清除所有資料？')) return;
                 
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedData = JSON.parse(e.target.result);
-                        
-                        if (!importedData.questions || !Array.isArray(importedData.questions)) {
-                            throw new Error('資料格式錯誤');
-                        }
-                        
-                        const message = `即將匯入 ${importedData.questions.length} 筆錯題。\n目前有 ${questions.length} 筆錯題。\n\n確定要繼續嗎？`;
-                        
-                        if (confirm(message)) {
-                            // 合併資料，避免重複
-                            const existingIds = new Set(questions.map(q => q.id));
-                            const newQuestions = importedData.questions.filter(q => !existingIds.has(q.id));
-                            questions = [...questions, ...newQuestions];
-                            
-                            saveQuestions();
-                            displayQuestions();
-                            showSuccess('資料匯入成功');
-                        }
-                        
-                    } catch (error) {
-                        console.error('匯入資料解析失敗:', error);
-                        showError('匯入失敗：資料格式錯誤');
-                    }
+                questions = [];
+                localStorage.removeItem('questions');
+                updateDisplay();
+                showNotification('已清除');
+            }
+
+            function updateDisplay() {
+                document.getElementById('total-questions').textContent = questions.length;
+                displayQuestions();
+            }
+
+            function getSubjectName(subject) {
+                // 處理自訂科目
+                if (subject.startsWith('custom:')) {
+                    return subject.substring(7); // 移除 'custom:' 前綴
+                }
+                
+                const names = { 
+                    chinese: '國文', 
+                    english: '英文', 
+                    math: '數學', 
+                    science: '自然', 
+                    social: '社會'
                 };
-                
-                reader.readAsText(file);
-                event.target.value = '';
-                
-            } catch (error) {
-                console.error('匯入失敗:', error);
-                showError('匯入失敗');
+                return names[subject] || subject;
             }
-        }
-        
-        function clearAllData() {
-            try {
-                if (questions.length === 0) {
-                    showError('沒有資料可以清除');
-                    return;
-                }
-                
-                const confirmed = confirm(
-                    `警告：即將刪除所有 ${questions.length} 筆錯題資料。\n\n建議先匯出備份，此操作無法復原。\n\n確定要繼續嗎？`
-                );
-                
-                if (confirmed) {
-                    const secondConfirm = confirm('最後確認：真的要刪除所有資料嗎？');
+
+            function getTypeName(type) {
+                const names = { 
+                    'true-false': '是非題', 
+                    'multiple-choice': '選擇題', 
+                    'short-answer': '簡答題', 
+                    'essay': '申論題', 
+                    'calculation': '計算題', 
+                    'other': '其他' 
+                };
+                return names[type] || type;
+            }
+
+            function getReasonName(reason) {
+                const names = { 
+                    'dont-know': '此題不會', 
+                    'calculation-error': '計算錯誤', 
+                    'concept-error': '觀念錯誤', 
+                    'careless': '粗心', 
+                    'other': '其他' 
+                };
+                return names[reason] || reason;
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // 標籤頁切換
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
                     
-                    if (secondConfirm) {
-                        questions = [];
-                        localStorage.removeItem('mistake-questions');
-                        
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                    document.getElementById(this.dataset.tab + '-tab').classList.remove('hidden');
+                    
+                    if (this.dataset.tab === 'collection') {
                         displayQuestions();
-                        updateStorageInfo();
-                        showSuccess('所有資料已清除');
                     }
-                }
-            } catch (error) {
-                console.error('清除資料失敗:', error);
-                showError('清除資料失敗');
-            }
-        }
+                });
+            });
 
-        function updateStorageInfo() {
-            try {
-                const totalElement = document.getElementById('total-questions');
-                const storageElement = document.getElementById('storage-info');
-                
-                if (totalElement) {
-                    totalElement.textContent = questions.length;
-                }
-                
-                if (storageElement) {
-                    const dataSize = JSON.stringify(questions).length;
-                    const sizeKB = Math.round(dataSize / 1024);
-                    storageElement.textContent = `本機儲存 (${sizeKB}KB)`;
-                }
-            } catch (error) {
-                console.error('更新儲存資訊失敗:', error);
-            }
-        }
-
-        // 輔助函數
-        function getSubjectName(subject) {
-            const subjects = {
-                'chinese': '國文',
-                'english': '英文',
-                'math': '數學',
-                'science': '自然',
-                'social': '社會',
-                'other': '其他'
+            // 公開 API
+            return {
+                capturePhoto,
+                switchCamera,
+                startSelection,
+                clearSelections,
+                saveQuestion,
+                resetEdit,
+                showModal,
+                closeModal,
+                deleteQuestion,
+                exportData,
+                clearAllData,
+                filterQuestions
             };
-            return subjects[subject] || subject;
-        }
-
-        function getQuestionTypeName(type) {
-            const types = {
-                'true-false': '是非題',
-                'multiple-choice': '選擇題',
-                'short-answer': '簡答題',
-                'essay': '申論題',
-                'calculation': '計算題',
-                'other': '其他'
-            };
-            return types[type] || type;
-        }
-
-        function getErrorReasonName(reason) {
-            const reasons = {
-                'dont-know': '此題不會',
-                'calculation-error': '計算錯誤',
-                'concept-error': '觀念錯誤',
-                'careless': '粗心',
-                'other': '其他'
-            };
-            return reasons[reason] || reason;
-        }
-
-        // 全域函數
-        window.showQuestionModal = showQuestionModal;
-
-        console.log('錯題集應用程式載入完成');
+        })();
     </script>
 </body>
 </html>
