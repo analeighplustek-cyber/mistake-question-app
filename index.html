@@ -618,55 +618,99 @@
                 
                 const img = document.getElementById('photo-preview');
                 img.style.cursor = 'crosshair';
+                img.style.touchAction = 'none'; // 防止觸控時的預設行為
+                
+                // 同時綁定滑鼠和觸控事件
                 img.addEventListener('mousedown', handleSelectionStart);
+                img.addEventListener('touchstart', handleSelectionStart, { passive: false });
                 
                 showNotification(`請框選${type === 'question' ? '題目' : '答案'}區域`);
             }
 
             function handleSelectionStart(e) {
+                e.preventDefault(); // 防止觸控時的預設行為
+                
                 const rect = e.target.getBoundingClientRect();
+                
+                // 處理觸控和滑鼠事件
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                
                 selectionStart = {
-                    x: e.clientX - rect.left,
-                    y: e.clientY - rect.top
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
                 };
 
                 const overlay = document.createElement('div');
                 overlay.className = `selection-overlay ${currentSelectionType}`;
+                overlay.style.position = 'absolute';
                 overlay.style.left = selectionStart.x + 'px';
                 overlay.style.top = selectionStart.y + 'px';
+                overlay.style.width = '0px';
+                overlay.style.height = '0px';
                 e.target.parentElement.appendChild(overlay);
                 
-                document.addEventListener('mousemove', updateSelection);
-                document.addEventListener('mouseup', endSelection);
+                // 同時綁定滑鼠和觸控的移動/結束事件
+                const moveHandler = function(e) {
+                    e.preventDefault();
+                    updateSelection(e, rect, overlay);
+                };
                 
-                function updateSelection(e) {
-                    const currentX = e.clientX - rect.left;
-                    const currentY = e.clientY - rect.top;
-                    
-                    overlay.style.width = Math.abs(currentX - selectionStart.x) + 'px';
-                    overlay.style.height = Math.abs(currentY - selectionStart.y) + 'px';
-                    overlay.style.left = Math.min(selectionStart.x, currentX) + 'px';
-                    overlay.style.top = Math.min(selectionStart.y, currentY) + 'px';
-                }
+                const endHandler = function(e) {
+                    e.preventDefault();
+                    document.removeEventListener('mousemove', moveHandler);
+                    document.removeEventListener('touchmove', moveHandler);
+                    document.removeEventListener('mouseup', endHandler);
+                    document.removeEventListener('touchend', endHandler);
+                    endSelection(overlay, e.target);
+                };
                 
-                function endSelection() {
-                    document.removeEventListener('mousemove', updateSelection);
-                    document.removeEventListener('mouseup', endSelection);
-                    
-                    selections.push({
-                        type: currentSelectionType,
-                        bounds: {
-                            left: parseInt(overlay.style.left),
-                            top: parseInt(overlay.style.top),
-                            width: parseInt(overlay.style.width),
-                            height: parseInt(overlay.style.height)
-                        }
-                    });
-                    
-                    selectionMode = false;
-                    e.target.style.cursor = 'default';
-                    e.target.removeEventListener('mousedown', handleSelectionStart);
-                }
+                document.addEventListener('mousemove', moveHandler);
+                document.addEventListener('touchmove', moveHandler, { passive: false });
+                document.addEventListener('mouseup', endHandler);
+                document.addEventListener('touchend', endHandler, { passive: false });
+            }
+            
+            function updateSelection(e, rect, overlay) {
+                if (!selectionStart) return;
+                
+                // 處理觸控和滑鼠事件
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                
+                const currentX = clientX - rect.left;
+                const currentY = clientY - rect.top;
+                
+                const left = Math.min(selectionStart.x, currentX);
+                const top = Math.min(selectionStart.y, currentY);
+                const width = Math.abs(currentX - selectionStart.x);
+                const height = Math.abs(currentY - selectionStart.y);
+                
+                overlay.style.left = left + 'px';
+                overlay.style.top = top + 'px';
+                overlay.style.width = width + 'px';
+                overlay.style.height = height + 'px';
+            }
+            
+            function endSelection(overlay, target) {
+                selections.push({
+                    type: currentSelectionType,
+                    bounds: {
+                        left: parseInt(overlay.style.left),
+                        top: parseInt(overlay.style.top),
+                        width: parseInt(overlay.style.width),
+                        height: parseInt(overlay.style.height)
+                    }
+                });
+                
+                selectionMode = false;
+                const img = document.getElementById('photo-preview');
+                img.style.cursor = 'default';
+                img.style.touchAction = 'auto';
+                img.removeEventListener('mousedown', handleSelectionStart);
+                img.removeEventListener('touchstart', handleSelectionStart);
+                
+                showNotification(`${currentSelectionType === 'question' ? '題目' : '答案'}區域已框選`);
             }
 
             function clearSelections() {
